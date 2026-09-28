@@ -1,0 +1,871 @@
+/* =========================
+   GENERAL
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    color: #222;
+}
+
+.container {
+    width: 92%;
+    max-width: 1150px;
+    margin: 35px auto;
+}
+
+h1,
+h2,
+h3 {
+    margin-top: 0;
+}
+
+p {
+    color: #777;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0;
+}
+
+
+/* =========================
+   LINKS
+========================= */
+
+a {
+    color: inherit;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header,
+.account-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.header p,
+.account-header p {
+    margin-top: 5px;
+}
+
+.account-header h1 {
+    margin: 12px 0 3px;
+    font-size: 32px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #666;
+    font-size: 14px;
+}
+
+.account-type {
+    color: #777;
+    margin: 0;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.create-btn {
+    border: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.create-btn:hover {
+    opacity: 0.85;
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+
+/* =========================
+   HOME ACCOUNTS
+========================= */
+
+.accounts-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(240px, 1fr)
+    );
+
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.account-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.2s;
+}
+
+.account-card:hover {
+    transform: translateY(-2px);
+    border-color: #aaa;
+}
+
+.account-name {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.account-type {
+    color: #777;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.account-balance {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 25px;
+}
+
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    border: 1px dashed #ccc;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.empty-state p {
+    color: #777;
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    display: none;
+
+    position: fixed;
+
+    z-index: 1000;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+
+    width: 90%;
+    max-width: 430px;
+
+    padding: 25px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 10px 40px
+        rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-btn {
+    border: none;
+    background: none;
+
+    font-size: 28px;
+
+    cursor: pointer;
+
+    color: #777;
+}
+
+.close-btn:hover {
+    color: #111;
+}
+
+.modal-category-name {
+    color: #777;
+    margin-top: -10px;
+}
+
+
+/* =========================
+   FORMS
+========================= */
+
+form {
+    margin-top: 10px;
+}
+
+label {
+    display: block;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-bottom: 6px;
+}
+
+input,
+select {
+    width: 100%;
+
+    padding: 10px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    margin-bottom: 12px;
+
+    background: white;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+
+    border-color: #888;
+}
+
+
+/* =========================
+   ACCOUNT BALANCE
+========================= */
+
+.balance-section {
+    padding: 25px 0;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.main-balance span {
+    color: #777;
+
+    font-size: 14px;
+}
+
+.main-balance h2 {
+    font-size: 42px;
+
+    margin: 5px 0 25px;
+}
+
+
+/* ALLOCATED / UNALLOCATED */
+
+.balance-summary {
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+.balance-summary .summary-box {
+    flex: 0 0 350px;
+
+    padding: 15px;
+
+    border: 5px solid #e2e2e2;
+
+    border-radius: 20px;
+
+    background: white;
+}
+
+.balance-summary .summary-box span {
+    display: block;
+
+    color: #777;
+
+    font-size: 13px;
+
+    margin-bottom: 5px;
+}
+
+.balance-summary .summary-box strong {
+    font-size: 18px;
+}
+
+
+/* =========================
+   SECTION HEADINGS
+========================= */
+
+.section-heading {
+    margin-top: 30px;
+}
+
+.section-heading h2 {
+    margin-bottom: 4px;
+}
+
+.section-heading span {
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   CATEGORIES
+========================= */
+
+.categories-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(280px, 1fr)
+        );
+
+    gap: 18px;
+
+    margin-top: 15px;
+}
+
+.category-card {
+    background: white;
+
+    border: 1px solid #e2e2e2;
+
+    border-radius: 14px;
+
+    padding: 20px;
+}
+
+.category-card-top {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+}
+
+.category-card h3 {
+    margin: 0;
+
+    font-size: 19px;
+}
+
+.category-label {
+    color: #888;
+
+    font-size: 12px;
+}
+
+.category-amount {
+    font-size: 21px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   SPEND ROW
+========================= */
+
+.spend-row {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2fr)
+        minmax(110px, 1fr)
+        auto;
+
+    gap: 8px;
+
+    align-items: end;
+
+    margin-top: 18px;
+}
+
+.spend-input {
+    min-width: 0;
+}
+
+.spend-input label {
+    display: block;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    margin-bottom: 5px;
+}
+
+.spend-input input {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin: 0;
+}
+
+.spend-btn {
+    height: 42px;
+
+    padding: 0 16px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   CATEGORY ACTIONS
+========================= */
+
+.category-actions {
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+.small-action-btn,
+.history-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 8px 12px;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.small-action-btn {
+    background: #f4f4f4;
+
+    color: #222;
+
+    border: 1px solid #ddd;
+}
+
+.history-btn {
+    background: #f4f4f4;
+
+    color: #222;
+
+    text-decoration: none;
+
+    border: 1px solid #ddd;
+}
+
+.small-action-btn:hover,
+.history-btn:hover {
+    background: #e9e9e9;
+}
+
+
+/* =========================
+   DELETE
+========================= */
+
+.delete-form {
+    margin-top: 12px;
+}
+
+.delete-btn {
+    width: 100%;
+
+    background: transparent;
+
+    color: #c62828;
+
+    border: 1px solid #e0b0b0;
+}
+
+.delete-btn:hover {
+    background: #fff5f5;
+}
+
+
+/* =========================
+   OTHER ACCOUNT SECTIONS
+========================= */
+
+.clean-section {
+    margin-top: 25px;
+}
+
+.section-title h2 {
+    margin-bottom: 5px;
+}
+
+.section-title p {
+    color: #777;
+
+    margin-top: 0;
+}
+
+.transfer-form {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr auto;
+
+    gap: 12px;
+
+    align-items: end;
+}
+
+.balance-update-form {
+    display: flex;
+
+    gap: 10px;
+}
+
+.balance-update-form input {
+    flex: 1;
+}
+
+.all-history-card {
+    margin-top: 25px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+.all-history-card p {
+    color: #777;
+}
+
+
+/* =========================
+   HISTORY
+========================= */
+
+.history-controls {
+    margin-top: 20px;
+}
+
+.filter-row {
+    display: grid;
+
+    grid-template-columns:
+        2fr 1fr 1fr 1fr;
+
+    gap: 15px;
+}
+
+.filter-group {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.filter-group label {
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+.history-summary {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    margin: 20px 0;
+}
+
+.history-summary .summary-box {
+    margin: 0;
+}
+
+.history-table-card {
+    padding: 0;
+
+    overflow: hidden;
+}
+
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+#historyTable,
+.history-table-card table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 700px;
+}
+
+#historyTable th,
+.history-table-card th {
+    background: #f5f5f5;
+
+    text-align: left;
+
+    padding: 14px;
+
+    font-size: 14px;
+
+    border-bottom: 1px solid #ddd;
+}
+
+#historyTable td,
+.history-table-card td {
+    padding: 14px;
+
+    border-bottom: 1px solid #eee;
+
+    vertical-align: middle;
+}
+
+.history-row {
+    cursor: pointer;
+
+    transition: background 0.15s;
+}
+
+.history-row:hover {
+    background: #f8f9fa;
+}
+
+.date-main {
+    font-weight: 600;
+}
+
+.date-time {
+    color: #888;
+
+    font-size: 12px;
+
+    margin-top: 3px;
+}
+
+.action-badge {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    background: #eee;
+}
+
+.amount-cell {
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+.muted {
+    color: #999;
+}
+
+.no-results {
+    display: none;
+
+    text-align: center;
+
+    padding: 40px;
+
+    color: #888;
+}
+
+.history-table-header {
+    padding: 20px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.history-table-header h2 {
+    margin-bottom: 5px;
+}
+
+.history-table-header p {
+    margin: 0;
+
+    color: #777;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+
+    .header,
+    .account-header {
+        flex-direction: column;
+    }
+
+
+    .main-balance h2 {
+        font-size: 34px;
+    }
+
+
+    .balance-summary {
+        gap: 10px;
+    }
+
+
+    .balance-summary .summary-box {
+        flex: 1;
+    }
+
+
+    .spend-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .spend-btn {
+        width: 100%;
+    }
+
+
+    .category-actions {
+        flex-direction: row;
+    }
+
+
+    .transfer-form {
+        grid-template-columns: 1fr;
+    }
+
+
+    .balance-update-form {
+        flex-direction: column;
+    }
+
+
+    .all-history-card {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .history-summary {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+.delete-account-btn {
+    background: transparent;
+    color: #c62828;
+    border: 1px solid #e0b0b0;
+    padding: 7px 4px;
+    border-radius: 6px;
+    font-size: 12px;
+    width: auto;
+}
+
+.delete-account-btn:hover {
+    background: #fff5f5;
+    opacity: 4;
+}

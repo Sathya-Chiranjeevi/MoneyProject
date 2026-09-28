@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>MoneyMap</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div>
+
+            <h1>MoneyMap</h1>
+
+            <p>Manage your money smarter.</p>
+
+        </div>
+
+
+        <button class="create-btn"
+                onclick="openModal()">
+
+            + Create Account
+
+        </button>
+
+    </div>
+
+
+    <hr>
+
+
+    <h2>Your Accounts</h2>
+
+
+    {% if accounts %}
+
+    <div class="accounts-grid">
+
+        {% for account in accounts %}
+
+        <a href="{{ url_for(
+            'account',
+            account_id=account['id']
+        ) }}"
+           class="account-card">
+
+            <div class="account-name">
+                {{ account['name'] }}
+            </div>
+
+            <div class="account-type">
+                {{ account['type'] }}
+            </div>
+
+            <div class="account-balance">
+                ₹{{ "%.2f"|format(account['balance']) }}
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>No accounts yet</h3>
+
+        <p>
+            Create your first account to start managing your money.
+        </p>
+
+        <button class="create-btn"
+                onclick="openModal()">
+
+            + Create Account
+
+        </button>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- CREATE ACCOUNT MODAL -->
+
+<div id="accountModal"
+     class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Create Account</h2>
+
+            <button class="close-btn"
+                    onclick="closeModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form action="{{ url_for('create_account') }}"
+              method="POST">
+
+            <label>Account Name</label>
+
+            <input type="text"
+                   name="name"
+                   placeholder="Example: HDFC Bank"
+                   required>
+
+
+            <label>Account Type</label>
+
+            <select name="type"
+                    required>
+
+                <option value="Bank Account">
+                    Bank Account
+                </option>
+
+                <option value="Cash">
+                    Cash
+                </option>
+
+                <option value="Savings">
+                    Savings
+                </option>
+
+                <option value="Credit Card">
+                    Credit Card
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <label>Current Balance</label>
+
+            <input type="number"
+                   name="balance"
+                   step="0.01"
+                   min="0"
+                   placeholder="₹ 0.00"
+                   required>
+
+
+            <button type="submit"
+                    class="create-btn modal-create">
+
+                Create Account
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function openModal() {
+
+    document.getElementById("accountModal")
+        .style.display = "flex";
+
+}
+
+
+function closeModal() {
+
+    document.getElementById("accountModal")
+        .style.display = "none";
+
+}
+
+
+window.onclick = function(event) {
+
+    const modal =
+        document.getElementById("accountModal");
+
+    if (event.target === modal) {
+
+        closeModal();
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

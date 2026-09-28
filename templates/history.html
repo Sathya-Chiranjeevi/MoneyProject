@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>History - MoneyMap</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <div class="account-header">
+
+        <div>
+
+            <a href="{{ url_for(
+                'account',
+                account_id=account['id']
+            ) }}"
+               class="back-link">
+
+                ← {{ account['name'] }}
+
+            </a>
+
+
+            <h1>Transaction History</h1>
+
+            <p class="account-type">
+                All account activity
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTERS -->
+
+    <div class="card history-controls">
+
+        <div class="filter-row">
+
+
+            <div class="filter-group">
+
+                <label>Search</label>
+
+                <input type="text"
+                       id="searchInput"
+                       placeholder="Search transactions...">
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Action</label>
+
+                <select id="actionFilter">
+
+                    <option value="all">
+                        All Actions
+                    </option>
+
+                    <option value="Created">
+                        Created
+                    </option>
+
+                    <option value="Updated">
+                        Updated
+                    </option>
+
+                    <option value="Spent">
+                        Spent
+                    </option>
+
+                    <option value="Transferred">
+                        Transferred
+                    </option>
+
+                    <option value="Deleted">
+                        Deleted
+                    </option>
+
+                    <option value="Balance">
+                        Balance
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Category</label>
+
+                <select id="categoryFilter">
+
+                    <option value="all">
+                        All Categories
+                    </option>
+
+
+                    {% for item in history %}
+
+                    {% if item['category_name'] %}
+
+                    <option value="{{ item['category_name'] }}">
+
+                        {{ item['category_name'] }}
+
+                    </option>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-group">
+
+                <label>Sort</label>
+
+                <select id="sortFilter">
+
+                    <option value="newest">
+                        Newest First
+                    </option>
+
+                    <option value="oldest">
+                        Oldest First
+                    </option>
+
+                    <option value="highest">
+                        Highest Amount
+                    </option>
+
+                    <option value="lowest">
+                        Lowest Amount
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <div class="history-summary">
+
+
+        <div class="summary-box">
+
+            <span>Transactions</span>
+
+            <strong id="transactionCount">
+                {{ history|length }}
+            </strong>
+
+        </div>
+
+
+        <div class="summary-box">
+
+            <span>Total Amount</span>
+
+            <strong>
+                ₹<span id="totalAmount">0.00</span>
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABLE -->
+
+    <div class="card history-table-card">
+
+        <div class="table-container">
+
+            <table id="historyTable">
+
+                <thead>
+
+                <tr>
+
+                    <th>Date</th>
+                    <th>Action</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for item in history %}
+
+                <tr class="history-row"
+
+                    data-action="{{ item['action'] }}"
+
+                    data-category="{{ item['category_name'] or '' }}"
+
+                    data-search="
+                    {{ (
+                        item['action']
+                        ~ ' '
+                        ~ (item['category_name'] or '')
+                        ~ ' '
+                        ~ (item['description'] or '')
+                    )|lower
+                    }}"
+
+                    data-amount="{{ item['amount'] }}">
+
+                    <td>
+
+                        <div class="date-main">
+                            {{ item['created_at'].split(' ')[0] }}
+                        </div>
+
+                        <div class="date-time">
+                            {{ item['created_at'].split(' ')[1] }}
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="action-badge">
+
+                            {{ item['action'] }}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if item['category_name'] %}
+
+                            {{ item['category_name'] }}
+
+                        {% else %}
+
+                            <span class="muted">
+                                —
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if item['description'] %}
+
+                            {{ item['description'] }}
+
+                        {% else %}
+
+                            <span class="muted">
+                                No description
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td class="amount-cell">
+
+                        ₹{{ "%.2f"|format(item['amount']) }}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <div id="noResults"
+             class="no-results">
+
+            No transactions found.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const actionFilter =
+    document.getElementById("actionFilter");
+
+const categoryFilter =
+    document.getElementById("categoryFilter");
+
+const sortFilter =
+    document.getElementById("sortFilter");
+
+const tableBody =
+    document.querySelector("#historyTable tbody");
+
+const rows =
+    Array.from(
+        document.querySelectorAll(".history-row")
+    );
+
+const transactionCount =
+    document.getElementById("transactionCount");
+
+const totalAmount =
+    document.getElementById("totalAmount");
+
+const noResults =
+    document.getElementById("noResults");
+
+
+function filterHistory() {
+
+    const search =
+        searchInput.value.toLowerCase();
+
+    const action =
+        actionFilter.value;
+
+    const category =
+        categoryFilter.value;
+
+    let visibleRows = [];
+
+
+    rows.forEach(row => {
+
+        const rowSearch =
+            row.dataset.search;
+
+        const rowAction =
+            row.dataset.action;
+
+        const rowCategory =
+            row.dataset.category;
+
+
+        const matchesSearch =
+            rowSearch.includes(search);
+
+
+        const matchesAction =
+            action === "all" ||
+            rowAction === action;
+
+
+        const matchesCategory =
+            category === "all" ||
+            rowCategory === category;
+
+
+        if (
+            matchesSearch &&
+            matchesAction &&
+            matchesCategory
+        ) {
+
+            row.style.display = "";
+
+            visibleRows.push(row);
+
+        } else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+
+    sortRows(visibleRows);
+
+    updateSummary(visibleRows);
+
+}
+
+
+function sortRows(visibleRows) {
+
+    const sort =
+        sortFilter.value;
+
+
+    visibleRows.sort((a, b) => {
+
+        const amountA =
+            parseFloat(a.dataset.amount);
+
+        const amountB =
+            parseFloat(b.dataset.amount);
+
+
+        if (sort === "highest") {
+
+            return amountB - amountA;
+
+        }
+
+
+        if (sort === "lowest") {
+
+            return amountA - amountB;
+
+        }
+
+
+        const dateA =
+            a.cells[0].innerText;
+
+        const dateB =
+            b.cells[0].innerText;
+
+
+        if (sort === "oldest") {
+
+            return dateA.localeCompare(dateB);
+
+        }
+
+
+        return dateB.localeCompare(dateA);
+
+    });
+
+
+    visibleRows.forEach(row => {
+
+        tableBody.appendChild(row);
+
+    });
+
+}
+
+
+function updateSummary(visibleRows) {
+
+    transactionCount.innerText =
+        visibleRows.length;
+
+
+    let total = 0;
+
+
+    visibleRows.forEach(row => {
+
+        total +=
+            parseFloat(row.dataset.amount);
+
+    });
+
+
+    totalAmount.innerText =
+        total.toFixed(2);
+
+
+    if (visibleRows.length === 0) {
+
+        noResults.style.display = "block";
+
+    } else {
+
+        noResults.style.display = "none";
+
+    }
+
+}
+
+
+searchInput.addEventListener(
+    "input",
+    filterHistory
+);
+
+actionFilter.addEventListener(
+    "change",
+    filterHistory
+);
+
+categoryFilter.addEventListener(
+    "change",
+    filterHistory
+);
+
+sortFilter.addEventListener(
+    "change",
+    filterHistory
+);
+
+
+filterHistory();
+
+</script>
+
+</body>
+
+</html>

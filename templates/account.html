@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ account['name'] }} - MoneyMap</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ACCOUNT HEADER -->
+
+    <div class="account-header">
+
+        <div>
+
+            <a href="{{ url_for('home') }}"
+               class="back-link">
+
+                ← Accounts
+
+            </a>
+
+            <h1>{{ account['name'] }}</h1>
+
+            <p class="account-type">
+                {{ account['type'] }}
+            </p>
+
+        </div>
+
+
+        <button class="create-btn"
+                onclick="openCategoryModal()">
+
+            + Add Category
+
+        </button>
+
+    </div>
+
+
+    <!-- BALANCE -->
+
+    <div class="balance-section">
+
+        <div class="main-balance">
+
+            <span>Current Balance</span>
+
+            <h2>
+                ₹{{ "%.2f"|format(account['balance']) }}
+            </h2>
+
+        </div>
+
+
+        <div class="balance-summary">
+
+            <div class="summary-box">
+
+                <span>Allocated</span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(allocated) }}
+                </strong>
+
+            </div>
+
+
+            <div class="summary-box">
+
+                <span>Unallocated</span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(unallocated) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CATEGORIES -->
+
+    <div class="section-heading">
+
+        <div>
+
+            <h2>Categories</h2>
+
+            <span>
+                {{ categories|length }} categories
+            </span>
+
+        </div>
+
+    </div>
+
+
+    {% if categories %}
+
+    <div class="categories-grid">
+
+        {% for category in categories %}
+
+        <div class="category-card">
+
+
+            <!-- CATEGORY HEADER -->
+
+            <div class="category-card-top">
+
+                <div>
+
+                    <h3>
+                        {{ category['name'] }}
+                    </h3>
+
+                    <span class="category-label">
+                        Available
+                    </span>
+
+                </div>
+
+
+                <strong class="category-amount">
+
+                    ₹{{ "%.2f"|format(
+                        category['amount']
+                    ) }}
+
+                </strong>
+
+            </div>
+
+
+            <!-- SPEND -->
+
+            <form action="{{ url_for('spend') }}"
+                  method="POST"
+                  class="spend-row">
+
+                <input type="hidden"
+                       name="category_id"
+                       value="{{ category['id'] }}">
+
+
+                <div class="spend-input description-input">
+
+                    <label>Description</label>
+
+                    <input type="text"
+                           name="description"
+                           placeholder="What did you spend on?"
+                           required>
+
+                </div>
+
+
+                <div class="spend-input amount-input">
+
+                    <label>Amount</label>
+
+                    <input type="number"
+                           name="amount"
+                           placeholder="₹ 0.00"
+                           min="0.01"
+                           step="0.01"
+                           required>
+
+                </div>
+
+
+                <button type="submit"
+                        class="spend-btn">
+
+                    Spend
+
+                </button>
+
+            </form>
+
+
+            <!-- CATEGORY ACTIONS -->
+
+            <div class="category-actions">
+
+                <button type="button"
+                        class="small-action-btn"
+                        onclick="openManageModal(
+                            '{{ category['id'] }}',
+                            '{{ category['name'] }}',
+                            '{{ category['amount'] }}'
+                        )">
+
+                    Manage
+
+                </button>
+
+
+                <a href="{{ url_for(
+                    'category_history',
+                    category_id=category['id']
+                ) }}"
+                   class="history-btn">
+
+                    History →
+
+                </a>
+
+            </div>
+
+
+            <!-- DELETE -->
+
+            <form action="{{ url_for('delete_category') }}"
+                  method="POST"
+                  class="delete-form"
+                  onsubmit="return confirm(
+                      'Delete {{ category['name'] }}?'
+                  );">
+
+                <input type="hidden"
+                       name="category_id"
+                       value="{{ category['id'] }}">
+
+
+                <button type="submit"
+                        class="delete-btn">
+
+                    Delete Category
+
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    {% else %}
+
+    <div class="empty-state">
+
+        <h3>No categories yet</h3>
+
+        <p>
+            Create categories such as Food, Rent,
+            Shopping, Savings or Emergency.
+        </p>
+
+
+        <button class="create-btn"
+                onclick="openCategoryModal()">
+
+            + Add Category
+
+        </button>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- TRANSFER -->
+
+    {% if categories|length >= 2 %}
+
+    <div class="card clean-section">
+
+        <div class="section-title">
+
+            <h2>Transfer Between Categories</h2>
+
+            <p>
+                Move allocated money without changing
+                the account balance.
+            </p>
+
+        </div>
+
+
+        <form action="{{ url_for('transfer') }}"
+              method="POST"
+              class="transfer-form">
+
+
+            <div>
+
+                <label>From</label>
+
+                <select name="from_category_id"
+                        required>
+
+                    {% for category in categories %}
+
+                    <option value="{{ category['id'] }}">
+
+                        {{ category['name'] }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>To</label>
+
+                <select name="to_category_id"
+                        required>
+
+                    {% for category in categories %}
+
+                    <option value="{{ category['id'] }}">
+
+                        {{ category['name'] }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Amount</label>
+
+                <input type="number"
+                       name="amount"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="₹ 0.00"
+                       required>
+
+            </div>
+
+
+            <button type="submit">
+                Transfer
+            </button>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ACCOUNT BALANCE -->
+
+    <div class="card clean-section">
+
+        <div class="section-title">
+
+            <h2>Account Balance</h2>
+
+            <p>
+                Update this when your actual bank balance changes.
+            </p>
+
+        </div>
+
+
+        <form action="{{ url_for('update_balance') }}"
+              method="POST"
+              class="balance-update-form">
+
+            <input type="hidden"
+                   name="account_id"
+                   value="{{ account['id'] }}">
+
+
+            <input type="number"
+                   name="balance"
+                   value="{{ account['balance'] }}"
+                   min="0"
+                   step="0.01"
+                   required>
+
+
+            <button type="submit">
+
+                Update Balance
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ACCOUNT HISTORY -->
+
+    <div class="card all-history-card">
+
+        <div>
+
+            <h2>Account History</h2>
+
+            <p>
+                View every transaction in this account.
+            </p>
+
+        </div>
+
+
+        <a href="{{ url_for(
+            'history',
+            account_id=account['id']
+        ) }}"
+           class="history-btn">
+
+            View All History →
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     CREATE CATEGORY MODAL
+========================= -->
+
+<div id="categoryModal"
+     class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Add Category</h2>
+
+            <button class="close-btn"
+                    onclick="closeCategoryModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <form action="{{ url_for('create_category') }}"
+              method="POST">
+
+            <input type="hidden"
+                   name="account_id"
+                   value="{{ account['id'] }}">
+
+
+            <label>Category Name</label>
+
+            <input type="text"
+                   name="name"
+                   placeholder="Example: Food"
+                   required>
+
+
+            <button type="submit"
+                    class="create-btn modal-create">
+
+                Create Category
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MANAGE ALLOCATION MODAL
+========================= -->
+
+<div id="manageModal"
+     class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Manage Allocation</h2>
+
+            <button class="close-btn"
+                    onclick="closeManageModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <p id="manageCategoryName"
+           class="modal-category-name">
+        </p>
+
+
+        <form action="{{ url_for('update_allocation') }}"
+              method="POST">
+
+            <input type="hidden"
+                   name="category_id"
+                   id="manageCategoryId">
+
+
+            <label>New Allocation</label>
+
+            <input type="number"
+                   name="amount"
+                   id="manageAmount"
+                   min="0"
+                   step="0.01"
+                   required>
+
+
+            <button type="submit"
+                    class="create-btn modal-create">
+
+                Update Allocation
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function openCategoryModal() {
+
+    document.getElementById("categoryModal")
+        .style.display = "flex";
+
+}
+
+
+function closeCategoryModal() {
+
+    document.getElementById("categoryModal")
+        .style.display = "none";
+
+}
+
+
+function openManageModal(id, name, amount) {
+
+    document.getElementById("manageCategoryId")
+        .value = id;
+
+    document.getElementById("manageCategoryName")
+        .innerText = name;
+
+    document.getElementById("manageAmount")
+        .value = amount;
+
+    document.getElementById("manageModal")
+        .style.display = "flex";
+
+}
+
+
+function closeManageModal() {
+
+    document.getElementById("manageModal")
+        .style.display = "none";
+
+}
+
+
+window.onclick = function(event) {
+
+    const categoryModal =
+        document.getElementById("categoryModal");
+
+    const manageModal =
+        document.getElementById("manageModal");
+
+
+    if (event.target === categoryModal) {
+
+        closeCategoryModal();
+
+    }
+
+
+    if (event.target === manageModal) {
+
+        closeManageModal();
+
+    }
+
+}
+
+</script>
+<!-- DELETE ACCOUNT -->
+
+<div class="card danger-section">
+
+    <div class="section-title">
+
+        <h2>Delete Account</h2>
+
+        <p>
+            Permanently delete this account and all
+            its categories and transaction history.
+        </p>
+
+    </div>
+
+
+    <form action="{{ url_for('delete_account') }}"
+          method="POST"
+          onsubmit="return confirmDeleteAccount();">
+
+        <input type="hidden"
+               name="account_id"
+               value="{{ account['id'] }}">
+
+
+        <button type="submit"
+                class="delete-account-btn">
+
+            Delete Account
+
+        </button>
+
+    </form>
+
+</div>
+            <script>
+
+function confirmDeleteAccount() {
+
+    const firstConfirm = confirm(
+        "Are you sure you want to delete this account?"
+    );
+
+    if (!firstConfirm) {
+        return false;
+    }
+
+
+    const secondConfirm = confirm(
+        "This will permanently delete the account, categories, allocations, and history. Continue?"
+    );
+
+    return secondConfirm;
+}
+
+</script>
+
+
+</body>
+
+</html>
